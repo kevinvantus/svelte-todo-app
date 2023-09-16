@@ -1,34 +1,111 @@
 <script>
-  const todos = [];
+  // @ts-nocheck
+  $: todoTitle = "";
+  $: todos = [];
+  let todoExists = false;
+  const priorities = {
+    low: "low",
+    normal: "normal",
+    high: "high",
+  };
 
   function submit() {
-    console.log("form submitted");
+    if (!todoTitle.length) return;
+
+    const todo = {
+      id: crypto.randomUUID(),
+      title: todoTitle.trim(),
+      done: false,
+      priority: "normal",
+    };
+    const todoIndex = todos.findIndex(
+      todo => todo.title.toLowerCase() === todoTitle.toLowerCase()
+    );
+
+    if (todoIndex === -1) {
+      todos = [...todos, todo];
+      todoTitle = "";
+    }
+  }
+
+  function input(evt) {
+    todoTitle = evt.target.value;
+
+    const todoIndex = todos.findIndex(
+      todo => todo.title.trim().toLowerCase() === todoTitle.trim().toLowerCase()
+    );
+
+    if (todoIndex > -1) {
+      todoExists = true;
+    } else {
+      todoExists = false;
+    }
   }
 </script>
 
 <main class="container">
-  <div class="card">
-    <form>
-      <!-- <form on:submit={submit}> -->
+  <h1 class="heading-level-1 u-text-center">Todo List</h1>
+
+  <div class="card u-margin-block-start-24">
+    <form on:submit|preventDefault={submit}>
       <div class="u-flex u-gap-12">
         <input
           type="text"
           class="input-text u-text-start"
           placeholder="Enter todo"
+          value={todoTitle}
+          on:input={input}
         />
-        <button class="button" on:click={submit}>
+        <button
+          class="button"
+          style="background-color: hsl(var(--color-information-100)); border-color: hsl(var(--color-information-100));"
+          on:click={submit}
+        >
           <span class="icon-plus" />
           <span class="text">Add</span></button
         >
       </div>
     </form>
 
-    <ul class="list u-text-start u-margin-block-start-32">
-      <li>
-        <input type="checkbox" id="" class="input-check" />
-        <label for="" />
-      </li>
-    </ul>
+    {#if todoExists}
+      <div class="u-text-center u-color-text-warning u-margin-block-start-16">
+        <p class="u-flex u-cross-center u-main-center">
+          <span class="icon-exclamation" />
+          <span>{todoTitle} already exists.</span>
+        </p>
+      </div>
+    {/if}
+
+    {#if todos.length}
+      <ul class="list u-gap-16 u-text-start u-margin-block-start-24">
+        {#each todos as todo (todo.id)}
+          <li class="u-flex u-cross-center u-gap-8">
+            <input type="checkbox" id={todo.title} class="input-check" />
+
+            <label for={todo.title} class="u-cursor-pointer u-capitalize"
+              >{todo.title}</label
+            >
+
+            <button
+              type="button"
+              class="button u-margin-inline-start-auto u-color-text-info is-text is-only-icon u-padding-0"
+            >
+              <span class="icon-pencil" />
+            </button>
+            <button
+              type="button"
+              class="button u-color-text-danger is-text is-only-icon u-padding-0"
+            >
+              <span class="icon-trash" />
+            </button>
+          </li>
+        {/each}
+      </ul>
+    {:else}
+      <p class="u-margin-block-start-24 u-text-center">
+        You have not added any todo(s).
+      </p>
+    {/if}
   </div>
 </main>
 
