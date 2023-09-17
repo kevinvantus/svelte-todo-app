@@ -1,6 +1,6 @@
 <script>
   // @ts-nocheck
-  $: todoTitle = "";
+  let todoTitle = "";
   $: todos = [];
   let todoExists = false;
   const priorities = {
@@ -28,9 +28,7 @@
     }
   }
 
-  function input(evt) {
-    todoTitle = evt.target.value;
-
+  function input() {
     const todoIndex = todos.findIndex(
       todo => todo.title.trim().toLowerCase() === todoTitle.trim().toLowerCase()
     );
@@ -53,7 +51,7 @@
           type="text"
           class="input-text u-text-start"
           placeholder="Enter todo"
-          value={todoTitle}
+          bind:value={todoTitle}
           on:input={input}
         />
         <button
