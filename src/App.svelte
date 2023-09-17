@@ -3,6 +3,8 @@
   let todoTitle = "";
   $: todos = [];
   let todoExists = false;
+  let editing = false;
+  let editIndex = null;
   const priorities = {
     low: "low",
     normal: "normal",
@@ -11,6 +13,13 @@
 
   function submit() {
     if (!todoTitle.length) return;
+
+    if (editing) {
+      todos[editIndex].title = todoTitle;
+      todoTitle = "";
+      editing = false;
+      return;
+    }
 
     const todo = {
       id: crypto.randomUUID(),
@@ -45,6 +54,12 @@
       if (todo.id === id) return { ...todo, done: true };
       return todo;
     });
+  }
+
+  function editTodo(id, idx) {
+    todoTitle = todos.find(todo => todo.id === id).title;
+    editIndex = idx;
+    editing = true;
   }
 
   function deleteTodo(id) {
@@ -87,7 +102,7 @@
 
     {#if todos.length}
       <ul class="list u-gap-16 u-text-start u-margin-block-start-24">
-        {#each todos as todo (todo.id)}
+        {#each todos as todo, i (todo.id)}
           <li class="u-flex u-cross-center u-gap-8">
             <input
               type="checkbox"
@@ -104,6 +119,7 @@
             <button
               type="button"
               class="button u-margin-inline-start-auto u-color-text-info is-text is-only-icon u-padding-0"
+              on:click={editTodo(todo.id, i)}
             >
               <span class="icon-pencil" />
             </button>
