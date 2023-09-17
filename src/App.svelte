@@ -39,6 +39,13 @@
       todoExists = false;
     }
   }
+
+  function toggleTodo(id) {
+    todos = todos.map(todo => {
+      if (todo.id === id) return { ...todo, done: true };
+      return todo;
+    });
+  }
 </script>
 
 <main class="container">
@@ -78,7 +85,13 @@
       <ul class="list u-gap-16 u-text-start u-margin-block-start-24">
         {#each todos as todo (todo.id)}
           <li class="u-flex u-cross-center u-gap-8">
-            <input type="checkbox" id={todo.title} class="input-check" />
+            <input
+              type="checkbox"
+              id={todo.title}
+              class="input-check"
+              bind:checked={todo.done}
+              on:change={toggleTodo(todo.id)}
+            />
 
             <label for={todo.title} class="u-cursor-pointer u-capitalize"
               >{todo.title}</label
