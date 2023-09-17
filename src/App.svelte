@@ -46,6 +46,10 @@
       return todo;
     });
   }
+
+  function deleteTodo(id) {
+    todos = todos.filter(todo => todo.id !== id);
+  }
 </script>
 
 <main class="container">
@@ -106,6 +110,7 @@
             <button
               type="button"
               class="button u-color-text-danger is-text is-only-icon u-padding-0"
+              on:click={deleteTodo(todo.id)}
             >
               <span class="icon-trash" />
             </button>
