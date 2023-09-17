@@ -1,4 +1,6 @@
 <script>
+  import TodoList from "./lib/TodoList.svelte";
+
   // @ts-nocheck
   let todoTitle = "";
   $: todos = [];
@@ -49,21 +51,24 @@
     }
   }
 
-  function toggleTodo(id) {
+  function toggleTodo(evt) {
+    const { id, done } = evt.detail;
+
     todos = todos.map(todo => {
-      if (todo.id === id) return { ...todo, done: true };
+      if (todo.id === id) return { ...todo, done };
       return todo;
     });
   }
 
-  function editTodo(id, idx) {
+  function editTodo(evt) {
+    const { id, idx } = evt.detail;
     todoTitle = todos.find(todo => todo.id === id).title;
     editIndex = idx;
     editing = true;
   }
 
-  function deleteTodo(id) {
-    todos = todos.filter(todo => todo.id !== id);
+  function deleteTodo(evt) {
+    todos = todos.filter(todo => todo.id !== evt.detail.id);
   }
 </script>
 
@@ -101,38 +106,12 @@
     {/if}
 
     {#if todos.length}
-      <ul class="list u-gap-16 u-text-start u-margin-block-start-24">
-        {#each todos as todo, i (todo.id)}
-          <li class="u-flex u-cross-center u-gap-8">
-            <input
-              type="checkbox"
-              id={todo.title}
-              class="input-check"
-              bind:checked={todo.done}
-              on:change={toggleTodo(todo.id)}
-            />
-
-            <label for={todo.title} class="u-cursor-pointer u-capitalize"
-              >{todo.title}</label
-            >
-
-            <button
-              type="button"
-              class="button u-margin-inline-start-auto u-color-text-info is-text is-only-icon u-padding-0"
-              on:click={editTodo(todo.id, i)}
-            >
-              <span class="icon-pencil" />
-            </button>
-            <button
-              type="button"
-              class="button u-color-text-danger is-text is-only-icon u-padding-0"
-              on:click={deleteTodo(todo.id)}
-            >
-              <span class="icon-trash" />
-            </button>
-          </li>
-        {/each}
-      </ul>
+      <TodoList
+        {todos}
+        on:toggle={toggleTodo}
+        on:edit={editTodo}
+        on:delete={deleteTodo}
+      />
     {:else}
       <p class="u-margin-block-start-24 u-text-center">
         You have not added any todo(s).
